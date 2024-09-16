@@ -86,9 +86,14 @@ public class SetupAgent extends Agent {
 //			ServiceDescription sd = new ServiceDescription();
 //			sd.setType("jade.tools.DummyAgent.DummyAgent");
 //			template.addServices(sd);
+			// Update the list of seller agents
+			DFAgentDescription template = new DFAgentDescription();
+			ServiceDescription sd2 = new ServiceDescription();
+			sd2.setType("communicator");
+			template.addServices(sd2);
 			
 			try {
-				DFAgentDescription[] result = DFService.search(myAgent, dfd);
+				DFAgentDescription[] result = DFService.search(myAgent, template);
 				if ( result.length > 0 ) {
 					System.out.println("ACHEI!" + result.toString());
 				} else {
@@ -96,7 +101,7 @@ public class SetupAgent extends Agent {
 				}
 				communicatorAgents = new AID[result.length + 1];
 				
-				for (int i = 0; i <= result.length; ++i) {
+				for (int i = 0; i < result.length; ++i) {
 					communicatorAgents[i] = result[i].getName();
 					System.out.println("ALOU: " + communicatorAgents[i].getName());
 				}

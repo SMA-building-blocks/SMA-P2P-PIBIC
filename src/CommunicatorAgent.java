@@ -19,7 +19,8 @@ public class CommunicatorAgent extends Agent {
 		sd.setType("communicator");
 		sd.setName("p2p-communicator");
 		dfd.addServices(sd);	
-		
+		System.out.println("Mensagem recebida: " + this.getName() + " socorram-me "+ this.getLocalName());
+
 		try {
 			DFService.register(this, dfd);
 		}
