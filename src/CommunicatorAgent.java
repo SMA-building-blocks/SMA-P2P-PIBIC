@@ -1,3 +1,4 @@
+package src;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -137,8 +138,11 @@ public class CommunicatorAgent extends Agent {
 			helloMessage.setContent("Hello from: " + myAgent.getName());
 			
 			for ( AID agent : communicatorAgents ) {
-				if ( agent != myAgent.getAID() ) {
-					helloMessage.addReceiver(agent);
+				if(agent != null) {
+					if (! myAgent.getName().equals(agent.getName()) ) {
+						//System.out.println("Enviando Mensagem de: "+myAgent.getName()+" para: " + agent.getName() + " igual? " + (myAgent.getName().equals(agent.getName())));
+						helloMessage.addReceiver(agent);
+					}
 				}
 			}
 			

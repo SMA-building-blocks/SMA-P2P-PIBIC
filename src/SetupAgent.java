@@ -1,3 +1,4 @@
+package src;
 
 import java.io.IOException;
 
@@ -71,7 +72,7 @@ public class SetupAgent extends Agent {
 			
 			try {				
 				for ( int i = 0; i < netSize; ++i ) {
-					communicators[i] = cc.createNewAgent("communicator" + i, "CommunicatorAgent", arg);
+					communicators[i] = cc.createNewAgent("communicator" + i, "src.CommunicatorAgent", arg);
 					
 					communicators[i].start();
 				}
