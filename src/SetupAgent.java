@@ -23,10 +23,17 @@ import jade.tools.DummyAgent.DummyAgent;
 public class SetupAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	private DFAgentDescription dfd;
-	
 	private AID[] communicatorAgents;
 	
+	private int netSize = 1;
+	
 	protected void setup () {
+		Object[] args = getArguments();
+		
+		if ( args[0] != null ) netSize = Integer.valueOf(args[0].toString());
+		
+		System.out.println("TAMANHO DA REDE A SER CRIADA: "+  netSize);
+		
 		dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		
@@ -60,13 +67,14 @@ public class SetupAgent extends Agent {
 			
 			arg[0] = reference;
 			
-			AgentController communicator1 = null;
+			AgentController[] communicators = new AgentController[netSize];
 			
-			try {
-				communicator1 = cc.createNewAgent("communicator1", "CommunicatorAgent", arg);
-				
-				communicator1.start();
-				
+			try {				
+				for ( int i = 0; i < netSize; ++i ) {
+					communicators[i] = cc.createNewAgent("communicator" + i, "CommunicatorAgent", arg);
+					
+					communicators[i].start();
+				}
 				
 			} catch ( StaleProxyException e ) {
 				e.printStackTrace();
@@ -82,11 +90,6 @@ public class SetupAgent extends Agent {
 			
 			ACLMessage isAlive = new ACLMessage(ACLMessage.REQUEST);
 			
-//			DFAgentDescription template = new DFAgentDescription();
-//			ServiceDescription sd = new ServiceDescription();
-//			sd.setType("jade.tools.DummyAgent.DummyAgent");
-//			template.addServices(sd);
-			// Update the list of seller agents
 			DFAgentDescription template = new DFAgentDescription();
 			ServiceDescription sd2 = new ServiceDescription();
 			sd2.setType("communicator");
@@ -119,11 +122,6 @@ public class SetupAgent extends Agent {
 			
 			myAgent.send(isAlive);
 			
-//			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchConversationId("setup-agent"),
-//					MessageTemplate.MatchInReplyTo(isAlive.getReplyWith()));
-//			
-//			ACLMessage reply = myAgent.receive(mt);
-			
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CONFIRM);
 			
 			ACLMessage recv_msg = myAgent.receive(mt);
@@ -136,9 +134,6 @@ public class SetupAgent extends Agent {
 				
 			}
 		}
-		
-		
-		
 	}
 	
 	protected void takeDown() {
