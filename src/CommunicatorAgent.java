@@ -19,15 +19,26 @@ public class CommunicatorAgent extends Agent {
 	private AID[] communicatorAgents;
 	private boolean mayIStart = false;
 	private ArrayList<String> iKnow;
+	private static int doIHaveInfo;
 	
 	protected void setup () {
+		Object[] args = getArguments();
+		
+		if ( args[1] != null ) doIHaveInfo = (int) args[1];
+		
+		System.out.println("Eu, " + this.getName() + ", devo transmitir informação? "+  doIHaveInfo);
+		
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
+		
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("communicator");
 		sd.setName("p2p-communicator");
+		
 		dfd.addServices(sd);	
+		
 		System.out.println("Eu sou: " + this.getName() + " e "+ this.getLocalName());
+		
 		iKnow = new ArrayList<String>();
 		try {
 			DFService.register(this, dfd);
@@ -148,7 +159,6 @@ public class CommunicatorAgent extends Agent {
 			
 			ACLMessage helloMessage = new ACLMessage(ACLMessage.INFORM);
 			
-			helloMessage.setContent("Hey there!");
 			helloMessage.setConversationId("communicator");
 			helloMessage.setContent("Hello from: " + myAgent.getName());
 			
@@ -162,6 +172,8 @@ public class CommunicatorAgent extends Agent {
 			//addBehaviour(new ReceiveMessage());
 			
 			myAgent.send(helloMessage);
+			
+			
 		}
 	}
 }
