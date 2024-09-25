@@ -89,38 +89,6 @@ public class CommunicatorAgent extends Agent {
 		}
 	}
 	
-//	private class ReceiveMessage extends CyclicBehaviour {
-//		
-//		private static final long serialVersionUID = 1L;
-//		
-//		public void action () {
-//			while ( !mayIStart ) {
-//				try {
-//					Thread.sleep(2500);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//			
-//			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-//			
-//			ACLMessage msg = myAgent.receive(mt);
-//					
-//			if ( msg != null ) {
-//				String title = msg.getContent();
-//				
-//				System.out.println("Mensagem de Hello recebida pelo " + myAgent.getName() + ": " + title);
-//				
-////				ACLMessage reply = msg.createReply();
-////				
-////				reply.setPerformative(ACLMessage.CONFIRM);
-////				
-////				myAgent.send(reply);
-//			}
-//			
-//		}
-//	}
-	
 	private class SendMessage extends OneShotBehaviour {
 		private static final long serialVersionUID = 1L;
 		

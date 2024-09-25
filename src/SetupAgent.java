@@ -78,7 +78,7 @@ public class SetupAgent extends Agent {
 					
 					if ( i == (netSize - 1) ) arg[1] = 1;
 					
-					communicators[i] = cc.createNewAgent("communicator" + i, "CommunicatorAgent", arg);
+					communicators[i] = cc.createNewAgent("communicator" + i, "src.CommunicatorAgent", arg);
 					
 					communicators[i].start();
 				}
