@@ -62,21 +62,23 @@ public class SetupAgent extends Agent {
 			
 			ContainerController cc = rt.createAgentContainer(p);
 			
-			
-			
 			AgentController[] communicators = new AgentController[netSize];
 			
 			try {				
 				for ( int i = 0; i < netSize; ++i ) {
 					Object reference = new Object();
 					
-					Object arg[] = new Object[2];
+					Object arg[] = new Object[3];
 					
 					arg[0] = reference;
 					arg[1] = 0;
+					arg[2] = "";
 					
 					
-					if ( i == (netSize - 1) ) arg[1] = 1;
+					if ( i == (netSize - 1) ) {
+						arg[1] = 1;
+						arg[2] = "eles brigaram 👀";
+					}
 					
 					communicators[i] = cc.createNewAgent("communicator" + i, "src.CommunicatorAgent", arg);
 					
