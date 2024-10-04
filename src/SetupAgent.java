@@ -33,11 +33,11 @@ public class SetupAgent extends Agent {
 	// Instance variables
     //////////////////////////////////
     protected JFrame m_frame = null;
-    protected Vector m_guestList = new Vector();    // invitees
-    protected int m_guestCount = 0;                 // arrivals
+    protected Vector m_peerList = new Vector();    // invitees
+    protected int m_peerCount = 0;                 // arrivals
     protected int m_rumourCount = 0;
     protected int m_introductionCount = 0;
-    protected boolean m_partyOver = false;
+    protected boolean m_networkOver = false;
     protected NumberFormat m_avgFormat = NumberFormat.getInstance();
     protected long m_startTime = 0L;
 
@@ -45,14 +45,8 @@ public class SetupAgent extends Agent {
 	private DFAgentDescription dfd;
 	private AID[] communicatorAgents;
 	
-	private int netSize = 1;
-	
 	protected void setup () {
 		Object[] args = getArguments();
-		
-		if ( args[0] != null ) netSize = Integer.valueOf(args[0].toString());
-		
-		System.out.println("TAMANHO DA REDE A SER CRIADA: "+  netSize);
 		
 		dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -156,11 +150,11 @@ public class SetupAgent extends Agent {
     
     protected void createPeers( int nPeers ) {
         // remove any old state
-        m_guestList.clear();
-        m_guestCount = 0;
+        m_peerList.clear();
+        m_peerCount = 0;
         m_rumourCount = 0;
         m_introductionCount = 0;
-        m_partyOver = false;
+        m_networkOver = false;
         ((HostUIFrame) m_frame).lbl_numIntroductions.setText( "0" );
         ((HostUIFrame) m_frame).prog_rumourCount.setValue( 0 );
         ((HostUIFrame) m_frame).lbl_rumourAvg.setText( "0.0" );
@@ -201,7 +195,7 @@ public class SetupAgent extends Agent {
                 //guest.doStart( "guest_" + i );
 
                 // keep the guest's ID on a local list
-                m_guestList.add( new AID(localName, AID.ISLOCALNAME) );
+                m_peerList.add( new AID(localName, AID.ISLOCALNAME) );
             }
         }
         catch (Exception e) {

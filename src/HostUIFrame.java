@@ -85,9 +85,9 @@ public class HostUIFrame
     Box box_buttons;
     JPanel pnl_numPeers = new JPanel();
     BorderLayout borderLayout3 = new BorderLayout();
-    JLabel lbl_numGuests = new JLabel();
-    Box box_numGuests;
-    JLabel lbl_guestCount = new JLabel();
+    JLabel lbl_numPeers = new JLabel();
+    Box box_numPeers;
+    JLabel lbl_peerCount = new JLabel();
     JSlider slide_numPeers = new JSlider();
     Component component1;
     Component component4;
@@ -138,7 +138,7 @@ public class HostUIFrame
         component2 = Box.createHorizontalStrut(5);
         box_buttons = Box.createHorizontalBox();
 
-        box_numGuests = Box.createHorizontalBox();
+        box_numPeers = Box.createHorizontalBox();
         component1 = Box.createGlue();
         component4 = Box.createHorizontalStrut(5);
         box1 = Box.createVerticalBox();
@@ -172,11 +172,11 @@ public class HostUIFrame
 //            }
 //        });
         pnl_numPeers.setLayout(borderLayout3);
-        lbl_numGuests.setText("No. of peers:");
-        lbl_guestCount.setMaximumSize(new Dimension(30, 17));
-        lbl_guestCount.setMinimumSize(new Dimension(30, 17));
-        lbl_guestCount.setPreferredSize(new Dimension(30, 17));
-        lbl_guestCount.setText("10");
+        lbl_numPeers.setText("No. of peers:");
+        lbl_peerCount.setMaximumSize(new Dimension(30, 17));
+        lbl_peerCount.setMinimumSize(new Dimension(30, 17));
+        lbl_peerCount.setPreferredSize(new Dimension(30, 17));
+        lbl_peerCount.setText("10");
         slide_numPeers.setValue(10);
         slide_numPeers.setMaximum(999);
         slide_numPeers.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -218,12 +218,12 @@ public class HostUIFrame
         pnl_main.add(jLabel3, null);
         pnl_main.add(lbl_rumourAvg, null);
         this.getContentPane().add(pnl_numPeers, BorderLayout.NORTH);
-        pnl_numPeers.add(box_numGuests, BorderLayout.CENTER);
+        pnl_numPeers.add(box_numPeers, BorderLayout.CENTER);
         pnl_numPeers.setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) ) );
 
-        box_numGuests.add(lbl_numGuests, null);
-        box_numGuests.add(slide_numPeers, null);
-        box_numGuests.add(lbl_guestCount, null);
+        box_numPeers.add(lbl_numPeers, null);
+        box_numPeers.add(slide_numPeers, null);
+        box_numPeers.add(lbl_peerCount, null);
         this.getContentPane().add(box_buttons, BorderLayout.SOUTH);
         box_buttons.add(component2, null);
         box_buttons.add(btn_start, null);
@@ -242,7 +242,7 @@ public class HostUIFrame
      * When the slider for the num guests changes, we update the label.
      */
     void slide_numPeers_stateChanged(ChangeEvent e) {
-        lbl_guestCount.setText( Integer.toString( slide_numPeers.getValue() ) );
+        lbl_peerCount.setText( Integer.toString( slide_numPeers.getValue() ) );
     }
 
 
