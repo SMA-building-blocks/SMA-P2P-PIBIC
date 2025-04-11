@@ -1,3 +1,15 @@
+# maven
+/target/
+
+# eclipse
+*.classpath
+*.project
+*.settings/
+
+# JADE
+*APDescription.txt
+*MTPs-Main-Container.txt
+
 # Compiled class file
 *.class
 
@@ -23,8 +35,3 @@
 hs_err_pid*
 replay_pid*
 /bin/
-
-APDescription.txt
-MTPs-Main-Container.txt
-
-/.classpath
