@@ -8,13 +8,11 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 
-/**
- * Class that set the main agent and it's actions
- */
+
 public class Creator extends BaseAgent {
 
 	private static final long serialVersionUID = 1L;
-	int workersQuorum = 0;
+	int peersQuorum = 0;
 
 	@Override
 	protected void setup() {
@@ -26,32 +24,32 @@ public class Creator extends BaseAgent {
 
 		logger.log(Level.INFO, "Starting Agents...");
 
-		logger.log(Level.INFO, "Creating Workers...");
+		logger.log(Level.INFO, "Creating Peers...");
 
-		ArrayList<String> workersName = new ArrayList<>();
+		ArrayList<String> peersName = new ArrayList<>();
 
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
-			workersQuorum = Integer.parseInt(args[0].toString());
+			peersQuorum = Integer.parseInt(args[0].toString());
 		}
 
-		for (int i = 0; i < workersQuorum; ++i) workersName.add("peer_" + i);
+		for (int i = 0; i < peersQuorum; ++i) peersName.add("peer_" + i);
 
 		try {
 			AgentContainer container = getContainerController();
 
-			workersName.forEach(worker -> {
-				// this.launchAgent(worker, "p2p_recommendation.Peer", null);
+			peersName.forEach(peer -> {
+				this.launchAgent(peer, "p2p_recommendation.Peer", null);
 				logger.log(Level.INFO, String.format("%s CREATED AND STARTED NEW PEER: %s ON CONTAINER %s",
-						getLocalName(), worker, container.getName()));
+						getLocalName(), peer, container.getName()));
 			});
 		} catch (Exception any) {
 			logger.log(Level.SEVERE, String.format("%s ERROR WHILE CREATING AGENTS %s", ANSI_RED, ANSI_RESET));
 			any.printStackTrace();
 		}
 
-		String m1AgentName = "FileServer";
-		launchAgent(m1AgentName, "p2p_recommendation.FileServer", null);
+		String fsAgentName = "FileServer";
+		launchAgent(fsAgentName, "p2p_recommendation.FileServer", null);
 
 		logger.log(Level.INFO, "Agents started...");
 		pauseSystem();
@@ -60,8 +58,8 @@ public class Creator extends BaseAgent {
 		
 		String content = String.format("START");
 
-		sendMessage(m1AgentName, ACLMessage.INFORM, content);
-		logger.log(Level.INFO, String.format("%s SENT START MESSAGE TO %s", getLocalName(), m1AgentName));
+		sendMessage(fsAgentName, ACLMessage.INFORM, content);
+		logger.log(Level.INFO, String.format("%s SENT START MESSAGE TO %s", getLocalName(), fsAgentName));
 	}
 
 	private void pauseSystem() {
