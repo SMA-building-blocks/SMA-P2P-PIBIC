@@ -32,6 +32,11 @@ public abstract class BaseAgent extends Agent {
 	public static final String CREATE = "CREATE";
 	public static final String CREATOR = "Creator";
 
+	public static final ArrayList<String> archivesReference = new ArrayList<String>(){{  
+		add("Archive1");
+		add("Archive2");
+	}};
+
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLUE = "\u001B[34m";
 	public static final String ANSI_BLACK = "\u001B[30m";

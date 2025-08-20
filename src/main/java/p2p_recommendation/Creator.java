@@ -1,7 +1,6 @@
 package p2p_recommendation;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 import jade.lang.acl.ACLMessage;
@@ -12,7 +11,7 @@ import jade.wrapper.AgentController;
 public class Creator extends BaseAgent {
 
 	private static final long serialVersionUID = 1L;
-	int peersQuorum = 0;
+	int peersQuorum = 3;
 
 	@Override
 	protected void setup() {
@@ -26,23 +25,24 @@ public class Creator extends BaseAgent {
 
 		logger.log(Level.INFO, "Creating Peers...");
 
-		ArrayList<String> peersName = new ArrayList<>();
-
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
-			peersQuorum = Integer.parseInt(args[0].toString());
+			peersQuorum = Math.max(Integer.parseInt(args[0].toString()), peersQuorum);
 		}
-
-		for (int i = 0; i < peersQuorum; ++i) peersName.add("peer_" + i);
 
 		try {
 			AgentContainer container = getContainerController();
+			for (int i = 0; i < peersQuorum; ++i) {
+				String peer = "peer_" + i;
+				Object[] arcRefs = null;
 
-			peersName.forEach(peer -> {
-				this.launchAgent(peer, "p2p_recommendation.Peer", null);
+				if ( i < archivesReference.size() )
+					arcRefs = new Object[]{archivesReference.get(i)};
+
+				this.launchAgent(peer, "p2p_recommendation.Peer", arcRefs);
 				logger.log(Level.INFO, String.format("%s CREATED AND STARTED NEW PEER: %s ON CONTAINER %s",
 						getLocalName(), peer, container.getName()));
-			});
+			}
 		} catch (Exception any) {
 			logger.log(Level.SEVERE, String.format("%s ERROR WHILE CREATING AGENTS %s", ANSI_RED, ANSI_RESET));
 			any.printStackTrace();
