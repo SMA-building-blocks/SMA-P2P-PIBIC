@@ -32,6 +32,10 @@ public abstract class BaseAgent extends Agent {
 	public static final String CREATE = "CREATE";
 	public static final String CREATOR = "Creator";
 
+	public static final String ARC_REQUEST = "ARC_REQUEST";
+	public static final String ARC_UPDATE = "ARC_UPDATE";
+	public static final String ARC_SEND = "ARC_SEND";
+
 	public static final ArrayList<String> archivesReference = new ArrayList<String>(){{  
 		add("Archive1");
 		add("Archive2");

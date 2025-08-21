@@ -1,6 +1,7 @@
 package p2p_recommendation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 import jade.lang.acl.ACLMessage;
@@ -12,6 +13,7 @@ public class Creator extends BaseAgent {
 
 	private static final long serialVersionUID = 1L;
 	int peersQuorum = 3;
+	ArrayList<String> peersName = new ArrayList<>();
 
 	@Override
 	protected void setup() {
@@ -34,6 +36,7 @@ public class Creator extends BaseAgent {
 			AgentContainer container = getContainerController();
 			for (int i = 0; i < peersQuorum; ++i) {
 				String peer = "peer_" + i;
+				peersName.add(peer);
 				Object[] arcRefs = null;
 
 				if ( i < archivesReference.size() )
@@ -58,8 +61,10 @@ public class Creator extends BaseAgent {
 		
 		String content = String.format("START");
 
-		sendMessage(fsAgentName, ACLMessage.INFORM, content);
-		logger.log(Level.INFO, String.format("%s SENT START MESSAGE TO %s", getLocalName(), fsAgentName));
+		for ( String peer : peersName ) {
+			sendMessage(peer, ACLMessage.INFORM, content);
+			logger.log(Level.INFO, String.format("%s SENT START MESSAGE TO %s", getLocalName(), peer));
+		}
 	}
 
 	private void pauseSystem() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 
 public class Peer extends BaseAgent {
@@ -25,6 +26,7 @@ public class Peer extends BaseAgent {
 		String helloMsg =  String.format("I'm %s", this.getLocalName(), 
 			( ownedArchives.isEmpty() ? "!" : " and I am a seeder!" ));
 
+
 		logger.log(Level.INFO, helloMsg);
 
 		this.registerDF(this, "Peer", "peer");
@@ -39,7 +41,7 @@ public class Peer extends BaseAgent {
 
 				switch (splittedMsg[0]) {
 					case START:
-						logger.log(Level.INFO, "I'm a peer and I've just received a start message!");
+						updateOwnedArchivesFS();
 						break;
 					default:
 						logger.log(Level.INFO, 
@@ -50,4 +52,24 @@ public class Peer extends BaseAgent {
 		};
 	}
 
+	protected void updateOwnedArchivesFS () {
+		StringBuilder strBld = new StringBuilder();
+
+		strBld.append(String.format("%s %d", ARC_UPDATE, ownedArchives.size()));
+
+		for ( String arc : ownedArchives ) {
+			strBld.append(String.format(" %s 1 1", arc));
+		}
+
+		DFAgentDescription[] fsAgent = searchAgentByType("FileServer");
+
+		try {
+			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			msg.setContent(strBld.toString());
+			msg.addReceiver(fsAgent[0].getName());
+			send(msg);
+		} catch (Exception e) {
+			logger.log(Level.WARNING, String.format("Agent FileServer Not Found: %s", e.toString()));
+		}
+	}
 }
