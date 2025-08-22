@@ -35,13 +35,19 @@ public abstract class BaseAgent extends Agent {
 	public static final String CREATE = "CREATE";
 	public static final String CREATOR = "Creator";
 
+	public static final String CONN_DETAILS = "CONN_DETAILS";
+	public static final String ARC_AVAILABLE = "ARC_AVAILABLE";
+	public static final String ARC_CONN_REQUEST = "ARC_CONN_REQUEST";
 	public static final String ARC_REQUEST = "ARC_REQUEST";
 	public static final String ARC_UPDATE = "ARC_UPDATE";
 	public static final String ARC_SEND = "ARC_SEND";
 	public static final String ARC_INIT = "ARC_INIT";
 	public static final String ARC_PART = "ARC_PART";
 
-	public static final ArrayList<String> archivesReference = new ArrayList<String>(Arrays.asList("Archive_1", "Archive_2"));
+	public static final Hashtable<String, ArrayList<Integer>> archivesReference = new Hashtable<>(Map.of(
+		"Archive_1", new ArrayList<>(Arrays.asList(1)),
+		"Archive_2", new ArrayList<>(Arrays.asList(1))
+	));
 	public Hashtable<String, Map<Integer, ArrayList<AID>>> fileSystemBase;
 
 	public static final String ANSI_RESET = "\u001B[0m";
@@ -301,8 +307,12 @@ public abstract class BaseAgent extends Agent {
 	protected void resetFileSystemBase () {
 		fileSystemBase = new Hashtable<>();
 
-		for ( String arc : archivesReference ) {
-			fileSystemBase.put(arc, new Hashtable<>());
+		for ( Map.Entry<String, ArrayList<Integer>> entryParts : archivesReference.entrySet() ) {
+			for ( int part : entryParts.getValue() ) {
+				fileSystemBase.put(entryParts.getKey(), new Hashtable<>(Map.of(
+					part, new ArrayList<>()
+				)));
+			}
 		}
 	}
 

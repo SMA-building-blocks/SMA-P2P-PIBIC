@@ -32,6 +32,8 @@ public class Creator extends BaseAgent {
 			peersQuorum = Math.max(Integer.parseInt(args[0].toString()), peersQuorum);
 		}
 
+		ArrayList<String> arcRefNames = new ArrayList<>(archivesReference.keySet());
+
 		try {
 			AgentContainer container = getContainerController();
 			for (int i = 0; i < peersQuorum; ++i) {
@@ -39,8 +41,8 @@ public class Creator extends BaseAgent {
 				peersName.add(peer);
 				Object[] arcRefs = null;
 
-				if ( i < archivesReference.size() )
-					arcRefs = new Object[]{archivesReference.get(i)};
+				if ( i < arcRefNames.size() )
+					arcRefs = new Object[]{arcRefNames.get(i)};
 
 				this.launchAgent(peer, "p2p_recommendation.Peer", arcRefs);
 				logger.log(Level.INFO, String.format("%s CREATED AND STARTED NEW PEER: %s ON CONTAINER %s",
