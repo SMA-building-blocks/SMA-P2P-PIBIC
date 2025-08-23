@@ -1,6 +1,9 @@
 package p2p_recommendation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -32,10 +35,20 @@ public abstract class BaseAgent extends Agent {
 	public static final String CREATE = "CREATE";
 	public static final String CREATOR = "Creator";
 
-	public static final ArrayList<String> archivesReference = new ArrayList<String>(){{  
-		add("Archive1");
-		add("Archive2");
-	}};
+	public static final String CONN_DETAILS = "CONN_DETAILS";
+	public static final String ARC_AVAILABLE = "ARC_AVAILABLE";
+	public static final String ARC_CONN_REQUEST = "ARC_CONN_REQUEST";
+	public static final String ARC_REQUEST = "ARC_REQUEST";
+	public static final String ARC_UPDATE = "ARC_UPDATE";
+	public static final String ARC_SEND = "ARC_SEND";
+	public static final String ARC_INIT = "ARC_INIT";
+	public static final String ARC_PART = "ARC_PART";
+
+	public static final Hashtable<String, ArrayList<Integer>> archivesReference = new Hashtable<>(Map.of(
+		"Archive_1", new ArrayList<>(Arrays.asList(1)),
+		"Archive_2", new ArrayList<>(Arrays.asList(1))
+	));
+	public Hashtable<String, Map<Integer, ArrayList<AID>>> fileSystemBase;
 
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLUE = "\u001B[34m";
@@ -52,6 +65,9 @@ public abstract class BaseAgent extends Agent {
 	protected static final Logger logger = Logger.getLogger(BaseAgent.class.getName());
 
 	protected static final Long TIMEOUT_LIMIT = 1000L;
+	protected static final Long REQUEST_TIMEOUT_LIMIT = 2000L;
+
+	private final transient Object lock = new Object();
 
 	@Override
 	protected void setup() {
@@ -287,5 +303,36 @@ public abstract class BaseAgent extends Agent {
 		logger.setUseParentHandlers(false);
 		logger.addHandler(handler);
 	}
+
+	protected void resetFileSystemBase () {
+		fileSystemBase = new Hashtable<>();
+
+		for ( Map.Entry<String, ArrayList<Integer>> entryParts : archivesReference.entrySet() ) {
+			for ( int part : entryParts.getValue() ) {
+				fileSystemBase.put(entryParts.getKey(), new Hashtable<>(Map.of(
+					part, new ArrayList<>()
+				)));
+			}
+		}
+	}
+
+	protected void printAllFiles () {
+        synchronized (lock) {
+            for(Map.Entry<String, Map<Integer, ArrayList<AID>>> entry : fileSystemBase.entrySet()){
+                logger.log(Level.INFO, String.format("%sData for current file: %s %s", ANSI_YELLOW, entry.getKey(), ANSI_RESET));
+
+                for (Map.Entry<Integer, ArrayList<AID>> entryParts : entry.getValue().entrySet()) {
+                    StringBuilder strBld = new StringBuilder();
+                    strBld.append(String.format("%s - %d: ", ANSI_YELLOW, entryParts.getKey()));
+                    for ( AID ag : entryParts.getValue() ) {
+                        strBld.append(String.format("%s ", ag.getLocalName()));
+                    }
+                    strBld.append(ANSI_RESET);
+
+                    logger.log(Level.INFO, strBld.toString());
+                }
+            }
+        }
+    }
 }
 
