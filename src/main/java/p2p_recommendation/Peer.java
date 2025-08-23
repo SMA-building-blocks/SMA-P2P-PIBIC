@@ -20,7 +20,7 @@ public class Peer extends BaseAgent {
 
 	private static final long serialVersionUID = 1L;
 	private Hashtable<String, ArrayList<Integer>> ownedArchives = new Hashtable<>();
-	private static Map<String, ArrayList<AID>>  partsRequested = Collections.synchronizedMap(new HashMap<>());
+	private static Map<String, ArrayList<AID>>  connRequested = Collections.synchronizedMap(new HashMap<>());
 	private static Map<String, Pair>  connInfos = Collections.synchronizedMap(new HashMap<>());
 	
 	private boolean amIASeeder = false;
@@ -59,10 +59,13 @@ public class Peer extends BaseAgent {
 				switch (splittedMsg[0]) {
 					case START:
 						if ( amIASeeder ) updateOwnedArchivesFS();
-						else addBehaviour(requestTimeout(TIMEOUT_LIMIT));
+						addBehaviour(requestTimeout(TIMEOUT_LIMIT));
 						break;
 					case INFORM:
 						sendFileRequestProposal(splittedMsg);
+						break;
+					case ARC_SEND:
+						handleRecvArc(splittedMsg);
 						break;
 					default:
 						logger.log(Level.INFO, 
@@ -87,12 +90,14 @@ public class Peer extends BaseAgent {
 					case CONN_DETAILS:
 						handleConnectionDetails(msg.getSender(), splittedMsg);
 						break;
+					case ARC_REQUEST:
+						handleArcRequest(msg);
+						break;
 					default:
 						logger.log(Level.INFO, 
 							String.format("%s %s %s", getLocalName(), UNEXPECTED_MSG, msg.getSender().getLocalName()));
 						break;
 				}
-
 			}
 		};
 	}
@@ -140,19 +145,13 @@ public class Peer extends BaseAgent {
 			String msgCnt = String.format("%s %s %s %d", ARC_CONN_REQUEST, arcName, ARC_PART, k);
 			for ( AID seeder : seedersByArchive.get(k) ) {
 				sendMessage(seeder.getLocalName(), ACLMessage.CFP, msgCnt);
-				if (partsRequested.get(arcName+'-'+k) == null){
-					partsRequested.put(arcName+'-'+k, new ArrayList<>(Arrays.asList(new AID(seeder.getLocalName(), AID.ISLOCALNAME))));
+				if ( connRequested.get(hashArcPart(arcName, Integer.toString(k))) == null ) {
+					connRequested.put(hashArcPart(arcName, Integer.toString(k)), new ArrayList<>(Arrays.asList(new AID(seeder.getLocalName(), AID.ISLOCALNAME))));
 				} else {
-					partsRequested.put(arcName+'-'+k, partsRequested.get(arcName+'-'+k) );
+					connRequested.put(hashArcPart(arcName, Integer.toString(k)), connRequested.get(hashArcPart(arcName, Integer.toString(k))) );
 				}
 			}
 		}
-
-		/*
-		* TO-DO: 
-		* Given all seeders by archive, we must require'em some 
-		* connection data to select one
-		*/
 	}
 
 	private void parseRecvFileData(String[] msgContent, String arcName, int qtdParts) {
@@ -184,8 +183,6 @@ public class Peer extends BaseAgent {
 	}
 
 	private void handleConnectionRequest ( AID sender, String [] splittedMsg ) {
-		// String.format("%s %s %s %d", ARC_CONN_REQUEST, arcName, ARC_PART, k);
-
 		int connVel = rand.nextInt(1, 11);
 		String arcName = splittedMsg[1];
 		int arcPart = Integer.parseInt(splittedMsg[3]);
@@ -194,55 +191,88 @@ public class Peer extends BaseAgent {
 		// CONN_DETAILS 1_a_10 ARC_AVAILABLE 1 arcName ARC_PART k
 		String messageContent;
 		
-		if(filePartAvb){
+		if ( filePartAvb ) {
 			messageContent = String.format("%s %d %s %d %s %s %s", CONN_DETAILS, connVel, ARC_AVAILABLE, 1, arcName, ARC_PART, arcPart);
-		}else{
+		} else {
 			messageContent = String.format("%s %d %s %d", CONN_DETAILS, connVel, ARC_AVAILABLE, 0);
 		}
 		
-		
 		sendMessage(sender.getLocalName(), filePartAvb? ACLMessage.PROPOSE: ACLMessage.REFUSE, messageContent);
-		
 	}
 
 	private void handleConnectionDetails ( AID sender, String [] splittedMsg ) {
-		if(Integer.parseInt(splittedMsg[3]) == 1){
+		if ( Integer.parseInt(splittedMsg[3]) == 1 ) {
 			Pair connSpeed = new Pair(new AID(sender.getLocalName(), AID.ISLOCALNAME), Integer.parseInt(splittedMsg[1]));
 
-			if(connInfos.get(splittedMsg[4]+'-'+splittedMsg[6]) == null){
-				connInfos.put(splittedMsg[4]+'-'+splittedMsg[6], connSpeed);
-			}else{
-				if(connInfos.get(splittedMsg[4]+'-'+splittedMsg[6]).value < connSpeed.value){
-					connInfos.put(splittedMsg[4]+'-'+splittedMsg[6], connSpeed);
+			if ( connInfos.get(hashArcPart(splittedMsg[4], splittedMsg[6])) == null ) {
+				connInfos.put(hashArcPart(splittedMsg[4], splittedMsg[6]), connSpeed);
+			} else {
+				if ( connInfos.get(hashArcPart(splittedMsg[4], splittedMsg[6])).value < connSpeed.value ) {
+					connInfos.put(hashArcPart(splittedMsg[4], splittedMsg[6]), connSpeed);
 				}
 			}
 
-			partsRequested.remove(splittedMsg[4]+'-'+splittedMsg[6]);
+			connRequested.remove(hashArcPart(splittedMsg[4], splittedMsg[6]));
 
-			if(partsRequested.isEmpty()){
-				requestArchive(connInfos.get(splittedMsg[4]+'-'+splittedMsg[6]), splittedMsg);
+			if ( connRequested.isEmpty() ) {
+				requestArchive(connInfos.get(hashArcPart(splittedMsg[4], splittedMsg[6])), splittedMsg[4], splittedMsg[6]);
 			}
 		}
 	}
 
+	private String hashArcPart ( String arcName, String arcPart ) {
+		return arcName + '-' + arcPart;
+	}
 
+	private void requestArchive ( Pair pair, String arcName, String arcPart ) {
+		sendMessage(pair.key.getLocalName(), ACLMessage.ACCEPT_PROPOSAL, String.format("%s %s %s %s", ARC_REQUEST, arcName, ARC_PART, arcPart));
+	}
 
-	private void requestArchive(Pair pair, String[] splittedMsg) {
-		System.out.println("ta pronto nao bro");
+	private void handleArcRequest ( ACLMessage message ) {
+		String [] splittedMsg = message.getContent().split(" ");
+		String arcName = splittedMsg[1];
+		String arcPart = splittedMsg[3]; 
+
+		ACLMessage newMsg = message.createReply();
+		newMsg.setContent(String.format("%s %s %s %s", ARC_SEND, arcName, ARC_PART, arcPart));
+		newMsg.setPerformative(ACLMessage.INFORM);
+		send(newMsg); 
+	}
+
+	private void handleRecvArc ( String [] splittedMsg ) {
+		String arcName = splittedMsg[1];
+		int arcPart = Integer.parseInt(splittedMsg[3]);
+
+		if ( ownedArchives.get(arcName) == null ) {
+			ownedArchives.put(arcName, new ArrayList<>(Arrays.asList(arcPart)));
+		} else {
+			ArrayList<Integer> ownedParts = ownedArchives.get(arcName);
+			ownedParts.add(arcPart);
+			ownedArchives.put(arcName, ownedParts);
+		}
+
+		String logMsg = String.format("%s I'm %s and I've just received %s (part %d)! %s", ANSI_GREEN, this.getLocalName(), arcName, arcPart, ANSI_RESET);
+		logger.log(Level.INFO, logMsg);
+
+		updateOwnedArchivesFS();
+
+		if ( doIHaveAllArchives() ) {
+			logMsg = String.format("%s I'm %s and I own all archives! %s", ANSI_GREEN, this.getLocalName(), ANSI_RESET);
+			logger.log(Level.INFO, logMsg);
+		}
 	}
 
 	private boolean filePartAvailable (String arcName, int arcPart) {
-		if(fileSystemBase.get(arcName) == null){
+		if ( fileSystemBase.get(arcName) == null ) {
 			return false;
 		}
-		if(fileSystemBase.get(arcName).get(arcPart) == null){
+		if ( fileSystemBase.get(arcName).get(arcPart) == null ) {
 			return false;
 		}
 		return true;
 	}
 
 	private void requestAllArchives () {
-
 		for ( Map.Entry<String, ArrayList<Integer>> entryParts : archivesReference.entrySet() ) {
 			ArrayList<Integer> allOwnedParts = ownedArchives.get(entryParts.getKey());
 			Set<Integer> missingParts = new HashSet<>(entryParts.getValue());
@@ -282,8 +312,6 @@ public class Peer extends BaseAgent {
 	
 		return true;
 	}
-
-	
 
 	private void updateOwnedArchivesFS () {
 		StringBuilder strBld = new StringBuilder();
