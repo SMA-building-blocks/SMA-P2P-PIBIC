@@ -1,6 +1,8 @@
 package p2p_recommendation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -18,6 +20,9 @@ public class Peer extends BaseAgent {
 
 	private static final long serialVersionUID = 1L;
 	private Hashtable<String, ArrayList<Integer>> ownedArchives = new Hashtable<>();
+	private static Map<String, ArrayList<AID>>  partsRequested = Collections.synchronizedMap(new HashMap<>());
+	private static Map<String, Pair>  connInfos = Collections.synchronizedMap(new HashMap<>());
+	
 	private boolean amIASeeder = false;
 
 	@Override
@@ -79,6 +84,9 @@ public class Peer extends BaseAgent {
 					case ARC_CONN_REQUEST:
 						handleConnectionRequest(msg.getSender(), splittedMsg);
 						break;
+					case CONN_DETAILS:
+						handleConnectionDetails(msg.getSender(), splittedMsg);
+						break;
 					default:
 						logger.log(Level.INFO, 
 							String.format("%s %s %s", getLocalName(), UNEXPECTED_MSG, msg.getSender().getLocalName()));
@@ -94,11 +102,17 @@ public class Peer extends BaseAgent {
 			private static final long serialVersionUID = 1L;
 
 			public void action() {
-				/*
-				 * TO-DO:
-				 * IMPLEMENT THIS METHOD BEHAVIOUR ON CONCRETE CLASS
-				 */
-				msg.createReply();
+				String [] splittedMsg = msg.getContent().split(" ");
+
+				switch (splittedMsg[0]) {
+					case CONN_DETAILS:
+						// AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+						break;
+					default:
+						logger.log(Level.INFO, 
+							String.format("%s %s %s", getLocalName(), UNEXPECTED_MSG, msg.getSender().getLocalName()));
+						break;
+				}
 			}
 		};
 	}
@@ -126,6 +140,11 @@ public class Peer extends BaseAgent {
 			String msgCnt = String.format("%s %s %s %d", ARC_CONN_REQUEST, arcName, ARC_PART, k);
 			for ( AID seeder : seedersByArchive.get(k) ) {
 				sendMessage(seeder.getLocalName(), ACLMessage.CFP, msgCnt);
+				if (partsRequested.get(arcName+'-'+k) == null){
+					partsRequested.put(arcName+'-'+k, new ArrayList<>(Arrays.asList(new AID(seeder.getLocalName(), AID.ISLOCALNAME))));
+				} else {
+					partsRequested.put(arcName+'-'+k, partsRequested.get(arcName+'-'+k) );
+				}
 			}
 		}
 
@@ -170,22 +189,55 @@ public class Peer extends BaseAgent {
 		int connVel = rand.nextInt(1, 11);
 		String arcName = splittedMsg[1];
 		int arcPart = Integer.parseInt(splittedMsg[3]);
+		boolean filePartAvb =  filePartAvailable(arcName, arcPart);
 
 		// CONN_DETAILS 1_a_10 ARC_AVAILABLE 1 arcName ARC_PART k
-		if ( filePartAvailable(arcName, arcPart) ) {
-
-		} else {
-			sendMessage(sender.getLocalName(), ACLMessage.REFUSE, String.format("%s %d %s %d", CONN_DETAILS, connVel, ARC_AVAILABLE, 0));
+		String messageContent;
+		
+		if(filePartAvb){
+			messageContent = String.format("%s %d %s %d %s %s %s", CONN_DETAILS, connVel, ARC_AVAILABLE, 1, arcName, ARC_PART, arcPart);
+		}else{
+			messageContent = String.format("%s %d %s %d", CONN_DETAILS, connVel, ARC_AVAILABLE, 0);
 		}
-
+		
+		
+		sendMessage(sender.getLocalName(), filePartAvb? ACLMessage.PROPOSE: ACLMessage.REFUSE, messageContent);
 		
 	}
 
+	private void handleConnectionDetails ( AID sender, String [] splittedMsg ) {
+		if(Integer.parseInt(splittedMsg[3]) == 1){
+			Pair connSpeed = new Pair(new AID(sender.getLocalName(), AID.ISLOCALNAME), Integer.parseInt(splittedMsg[1]));
+
+			if(connInfos.get(splittedMsg[4]+'-'+splittedMsg[6]) == null){
+				connInfos.put(splittedMsg[4]+'-'+splittedMsg[6], connSpeed);
+			}else{
+				if(connInfos.get(splittedMsg[4]+'-'+splittedMsg[6]).value < connSpeed.value){
+					connInfos.put(splittedMsg[4]+'-'+splittedMsg[6], connSpeed);
+				}
+			}
+
+			partsRequested.remove(splittedMsg[4]+'-'+splittedMsg[6]);
+
+			if(partsRequested.isEmpty()){
+				requestArchive(connInfos.get(splittedMsg[4]+'-'+splittedMsg[6]), splittedMsg);
+			}
+		}
+	}
+
+
+
+	private void requestArchive(Pair pair, String[] splittedMsg) {
+		System.out.println("ta pronto nao bro");
+	}
+
 	private boolean filePartAvailable (String arcName, int arcPart) {
-		/*
-		 * TO-DO: 
-		 * verify if the requested part is available at a local fileBase
-		 */
+		if(fileSystemBase.get(arcName) == null){
+			return false;
+		}
+		if(fileSystemBase.get(arcName).get(arcPart) == null){
+			return false;
+		}
 		return true;
 	}
 
@@ -200,13 +252,13 @@ public class Peer extends BaseAgent {
 				missingParts.removeAll(ownedParts);
 			}
 
-			if ( !missingParts.isEmpty() ) requestArchive(entryParts.getKey());
+			if ( !missingParts.isEmpty() ) requestArchiveList(entryParts.getKey());
 		}
 		
 		addBehaviour(requestTimeout(REQUEST_TIMEOUT_LIMIT));
 	}
 
-	private void requestArchive ( String arcName ) {
+	private void requestArchiveList ( String arcName ) {
 		DFAgentDescription[] fsAgent = searchAgentByType("FileServer");
 
 		try {
