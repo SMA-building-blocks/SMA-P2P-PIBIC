@@ -74,13 +74,6 @@ public class FileServer extends BaseAgent {
 		Map<Integer, ArrayList<AID>> seedersByArchive = fileSystemBase.get(arcName);
 
 		synchronized (lock) {
-			if ( seedersByArchive == null ) {
-				/*
-				 * TO-DO:
-				 * Inform requesting peer that this FileServer does not 
-				 * contain the requested archive
-				 */
-			}
 			
 			StringBuilder strBld = new StringBuilder();
 			strBld.append(String.format("%s %s %d ", INFORM, arcName, seedersByArchive.size()));

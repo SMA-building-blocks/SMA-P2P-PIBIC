@@ -41,9 +41,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis congue nisl ac sem
 
 1. **Posse de Arquivos:** os agentes *peers* devem ser capazes de alocar para si mesmos arquivos (inicialmente representados de forma teórica), sejam eles completos ou fragmentados;
 2. **Listagem de Arquivos:** o sistema deve prover uma estrutura que indique a posse integral ou parcial de arquivos pelos agentes *peers*;
-3. **Solicitação de Arquivos:** a partir da listagem de posse de arquivos, um agente *peer* deve ser capaz de solicitar a outro um arquivo (parcial ou integral). A escolha do agente ao qual a solicitação será feita deve considerar critérios que indiquem características básicas de transmissão de conteúdo e a confiabilidade da fonte;
+3. **Solicitação de Arquivos:** a partir da listagem de posse de arquivos, um agente *peer* deve ser capaz de solicitar a outro um arquivo (parcial ou integral). A escolha do agente ao qual a solicitação será feita deve considerar critérios que indiquem características básicas de transmissão de conteúdo;
 4. **Envio de Arquivos:** mediante solicitação de um outro *peer*, um agente *peer* deve ser capaz de enviar os arquivos em sua posse ao requerente;
-5. **Indicação de Reputação:** a partir da comunicação entre agentes *peers*, a parte requerente deve ser capaz de informar à estrutura de listagem informações referentes à qualidade e confiabilidade da fonte;
+5. **Análise de Reputação:** o requerente deve avaliar a qualidade momentânea da conexão com os *seeders* permitindo uma escolha direcionada da melhor fonte.
 
 ## Requisitos para Execução
 
