@@ -111,7 +111,8 @@ public class Peer extends BaseAgent {
 
 				switch (splittedMsg[0]) {
 					case CONN_DETAILS:
-						// AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+						logger.log(Level.INFO, 
+							String.format("%s CFP Refused by %s %s", ANSI_YELLOW, msg.getSender().getLocalName(), ANSI_RESET));
 						break;
 					default:
 						logger.log(Level.INFO, 
