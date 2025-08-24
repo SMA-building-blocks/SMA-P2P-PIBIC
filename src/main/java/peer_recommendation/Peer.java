@@ -1,4 +1,4 @@
-package p2p_recommendation;
+package peer_recommendation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class Peer extends BaseAgent {
 
 		if ( !ownedArchives.isEmpty() ) amIASeeder = true;
 
-		String helloMsg =  String.format("I'm %s", this.getLocalName(), 
+		String helloMsg =  String.format("I'm %s%s", this.getLocalName(), 
 			( !amIASeeder ? "!" : " and I am a seeder!" ));
 
 
@@ -49,6 +49,7 @@ public class Peer extends BaseAgent {
 		this.registerDF(this, "Peer", "Peer");
 	}
 
+	@Override
 	protected OneShotBehaviour handleInform(ACLMessage msg) {
 		return new OneShotBehaviour(this) {
 			private static final long serialVersionUID = 1L;
@@ -68,14 +69,14 @@ public class Peer extends BaseAgent {
 						handleRecvArc(splittedMsg);
 						break;
 					default:
-						logger.log(Level.INFO, 
-							String.format("%s %s %s", getLocalName(), UNEXPECTED_MSG, msg.getSender().getLocalName()));
+						showUnexpectedMsg(msg);
 						break;
 				}
 			}
 		};
 	}
 
+	@Override
 	protected OneShotBehaviour handleCfp(ACLMessage msg) {
 		return new OneShotBehaviour(this) {
 			private static final long serialVersionUID = 1L;
@@ -94,14 +95,14 @@ public class Peer extends BaseAgent {
 						handleArcRequest(msg);
 						break;
 					default:
-						logger.log(Level.INFO, 
-							String.format("%s %s %s", getLocalName(), UNEXPECTED_MSG, msg.getSender().getLocalName()));
+						showUnexpectedMsg(msg);
 						break;
 				}
 			}
 		};
 	}
 
+	@Override
 	protected OneShotBehaviour handleRefuse(ACLMessage msg) {
 		return new OneShotBehaviour(this) {
 			private static final long serialVersionUID = 1L;
@@ -115,8 +116,7 @@ public class Peer extends BaseAgent {
 							String.format("%s CFP Refused by %s %s", ANSI_YELLOW, msg.getSender().getLocalName(), ANSI_RESET));
 						break;
 					default:
-						logger.log(Level.INFO, 
-							String.format("%s %s %s", getLocalName(), UNEXPECTED_MSG, msg.getSender().getLocalName()));
+						showUnexpectedMsg(msg);
 						break;
 				}
 			}
@@ -142,7 +142,9 @@ public class Peer extends BaseAgent {
 
 		Map<Integer, ArrayList<AID>> seedersByArchive = fileSystemBase.get(arcName);
 
-		for ( int k : seedersByArchive.keySet() ) {
+		for ( Map.Entry<Integer, ArrayList<AID>> entryParts : seedersByArchive.entrySet() ) {
+			int k = entryParts.getKey();
+
 			String msgCnt = String.format("%s %s %s %d", ARC_CONN_REQUEST, arcName, ARC_PART, k);
 			for ( AID seeder : seedersByArchive.get(k) ) {
 				sendMessage(seeder.getLocalName(), ACLMessage.CFP, msgCnt);
@@ -158,7 +160,8 @@ public class Peer extends BaseAgent {
 	private void parseRecvFileData(String[] msgContent, String arcName, int qtdParts) {
 		HashMap<Integer, ArrayList<AID>> seedersByPart = new HashMap<>();
 
-		int cntParts = 0, idx = 3;
+		int cntParts = 0;
+		int idx = 3;
 		while ( cntParts < qtdParts ) {
 			int currentPart = Integer.parseInt(msgContent[idx++]);
 			int numAgents = Integer.parseInt(msgContent[idx]);
@@ -264,13 +267,10 @@ public class Peer extends BaseAgent {
 	}
 
 	private boolean filePartAvailable (String arcName, int arcPart) {
-		if ( fileSystemBase.get(arcName) == null ) {
-			return false;
-		}
-		if ( fileSystemBase.get(arcName).get(arcPart) == null ) {
-			return false;
-		}
-		return true;
+		if ( fileSystemBase.get(arcName) != null && fileSystemBase.get(arcName).get(arcPart) != null ) 
+			return true;
+		
+		return false;
 	}
 
 	private void requestAllArchives () {
@@ -335,5 +335,10 @@ public class Peer extends BaseAgent {
 		} catch (Exception e) {
 			logger.log(Level.WARNING, String.format("Agent FileServer Not Found: %s", e.toString()));
 		}
+	}
+
+	private void showUnexpectedMsg(ACLMessage msg) {
+		logger.log(Level.INFO, 
+			String.format("%s %s %s", getLocalName(), UNEXPECTED_MSG, msg.getSender().getLocalName()));
 	}
 }

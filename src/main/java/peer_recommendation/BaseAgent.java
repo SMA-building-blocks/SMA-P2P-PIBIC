@@ -1,7 +1,8 @@
-package p2p_recommendation;
+package peer_recommendation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Random;
@@ -44,11 +45,11 @@ public abstract class BaseAgent extends Agent {
 	public static final String ARC_INIT = "ARC_INIT";
 	public static final String ARC_PART = "ARC_PART";
 
-	public static final Hashtable<String, ArrayList<Integer>> archivesReference = new Hashtable<>(Map.of(
+	public static final Map<String, ArrayList<Integer>> archivesReference = new HashMap<>(Map.of(
 		"Archive_1", new ArrayList<>(Arrays.asList(1)),
 		"Archive_2", new ArrayList<>(Arrays.asList(1))
 	));
-	public Hashtable<String, Map<Integer, ArrayList<AID>>> fileSystemBase;
+	protected Hashtable<String, Map<Integer, ArrayList<AID>>> fileSystemBase;
 
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLUE = "\u001B[34m";
