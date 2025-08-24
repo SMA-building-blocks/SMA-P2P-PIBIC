@@ -61,7 +61,7 @@ public class Creator extends BaseAgent {
 		// send them a message demanding start
 		logger.log(Level.INFO, "Starting system!");
 		
-		String content = String.format("START");
+		String content = START;
 
 		for ( String peer : peersName ) {
 			sendMessage(peer, ACLMessage.INFORM, content);

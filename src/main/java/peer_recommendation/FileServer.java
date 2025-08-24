@@ -27,6 +27,7 @@ public class FileServer extends BaseAgent {
 		addBehaviour(handleMessages());
 	}
 
+	@Override
 	protected OneShotBehaviour handleInform(ACLMessage msg) {
 		return new OneShotBehaviour(this) {
 			private static final long serialVersionUID = 1L;
@@ -47,6 +48,7 @@ public class FileServer extends BaseAgent {
 		};
 	}
 
+	@Override
 	protected OneShotBehaviour handleRequest(ACLMessage msg) {
 		return new OneShotBehaviour(this) {
 			private static final long serialVersionUID = 1L;
@@ -78,7 +80,11 @@ public class FileServer extends BaseAgent {
 			StringBuilder strBld = new StringBuilder();
 			strBld.append(String.format("%s %s %d ", INFORM, arcName, seedersByArchive.size()));
 
-			for ( int partNum : seedersByArchive.keySet() ) {
+
+			
+			for ( Map.Entry<Integer, ArrayList<AID>> entryParts : seedersByArchive.entrySet() ) {
+				int partNum = entryParts.getKey();
+
 				ArrayList<AID> seedersByPart = seedersByArchive.get(partNum);
 
 				strBld.append(String.format("%d %d", partNum, seedersByPart.size()));
@@ -103,7 +109,8 @@ public class FileServer extends BaseAgent {
 		int arcQtd = Integer.parseInt(msgContent[1]);
 
 		synchronized (lock) {
-			int i = 2, arcCnt = 0;
+			int i = 2;
+			int arcCnt = 0;
 			while ( arcCnt < arcQtd ) {
 				if ( !fileSystemBase.containsKey(msgContent[i]) ) 
 					fileSystemBase.put(msgContent[i], new Hashtable<>());
@@ -114,7 +121,7 @@ public class FileServer extends BaseAgent {
 				while ( ++i <= (filePos + 1 + partsQtd) ) {
 					Map<Integer, ArrayList<AID>> updateMap = fileSystemBase.get(msgContent[filePos]);
 
-					if ( updateMap == null ) updateMap = new Hashtable<Integer, ArrayList<AID>>();
+					if ( updateMap == null ) updateMap = new Hashtable<>();
 
 					int currentPart = Integer.parseInt(msgContent[i]);
 
