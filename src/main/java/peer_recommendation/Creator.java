@@ -1,4 +1,4 @@
-package p2p_recommendation;
+package peer_recommendation;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class Creator extends BaseAgent {
 				if ( i < arcRefNames.size() )
 					arcRefs = new Object[]{arcRefNames.get(i)};
 
-				this.launchAgent(peer, "p2p_recommendation.Peer", arcRefs);
+				this.launchAgent(peer, "peer_recommendation.Peer", arcRefs);
 				logger.log(Level.INFO, String.format("%s CREATED AND STARTED NEW PEER: %s ON CONTAINER %s",
 						getLocalName(), peer, container.getName()));
 			}
@@ -54,7 +54,7 @@ public class Creator extends BaseAgent {
 		}
 
 		String fsAgentName = "FileServer";
-		launchAgent(fsAgentName, "p2p_recommendation.FileServer", null);
+		launchAgent(fsAgentName, "peer_recommendation.FileServer", null);
 
 		logger.log(Level.INFO, "Agents started...");
 		pauseSystem();

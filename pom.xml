@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>peer2peer</groupId>
-  <artifactId>p2p_recommendation</artifactId>
+  <artifactId>peer_recommendation</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>p2p_recommendation</name>
-  <description>p2p_recommendation</description>
+  <name>peer_recommendation</name>
+  <description>peer_recommendation</description>
 
   <properties>
     <sonar.organization>sma-p2p-pibic-andre-gabriel</sonar.organization>

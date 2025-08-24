@@ -1,4 +1,4 @@
-package p2p_recommendation;
+package peer_recommendation;
 
 import java.util.ArrayList;
 import java.util.Arrays;

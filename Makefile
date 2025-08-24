@@ -1,7 +1,7 @@
 QUORUM ?= 3
 DF_MAX_RESULT := $(shell expr $(QUORUM) + 5)
-PATH_PROJECT_JAR = target/p2p_recommendation-0.0.1-SNAPSHOT.jar
-PROJECT_GROUP    = p2p_recommendation
+PATH_PROJECT_JAR = target/peer_recommendation-0.0.1-SNAPSHOT.jar
+PROJECT_GROUP    = peer_recommendation
 JADE_AGENTS      = creator:$(PROJECT_GROUP).Creator($(QUORUM));
 JADE_FLAGS 		 = -gui -jade_domain_df_maxresult $(DF_MAX_RESULT) -agents "$(JADE_AGENTS)"
 
