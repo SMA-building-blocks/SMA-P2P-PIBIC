@@ -45,7 +45,7 @@ public abstract class BaseAgent extends Agent {
 	public static final String ARC_INIT = "ARC_INIT";
 	public static final String ARC_PART = "ARC_PART";
 
-	public static final Map<String, ArrayList<Integer>> archivesReference = new HashMap<>(Map.of(
+	protected static final Map<String, ArrayList<Integer>> archivesReference = new HashMap<>(Map.of(
 		"Archive_1", new ArrayList<>(Arrays.asList(1)),
 		"Archive_2", new ArrayList<>(Arrays.asList(1))
 	));
