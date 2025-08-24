@@ -267,10 +267,7 @@ public class Peer extends BaseAgent {
 	}
 
 	private boolean filePartAvailable (String arcName, int arcPart) {
-		if ( fileSystemBase.get(arcName) != null && fileSystemBase.get(arcName).get(arcPart) != null ) 
-			return true;
-		
-		return false;
+		return (fileSystemBase.get(arcName) != null && fileSystemBase.get(arcName).get(arcPart) != null);
 	}
 
 	private void requestAllArchives () {
