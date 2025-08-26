@@ -20,8 +20,8 @@ public class Peer extends BaseAgent {
 
 	private static final long serialVersionUID = 1L;
 	private Hashtable<String, ArrayList<Integer>> ownedArchives = new Hashtable<>();
-	private static Map<String, ArrayList<AID>>  connRequested = Collections.synchronizedMap(new HashMap<>());
-	private static Map<String, Pair>  connInfos = Collections.synchronizedMap(new HashMap<>());
+	private Map<String, ArrayList<AID>>  connRequested = Collections.synchronizedMap(new HashMap<>());
+	private Map<String, Pair>  connInfos = Collections.synchronizedMap(new HashMap<>());
 	
 	private boolean amIASeeder = false;
 
