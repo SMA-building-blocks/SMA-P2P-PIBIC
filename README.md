@@ -35,11 +35,11 @@ Abaixo, é apresentado o Diagrama de Classes que visa representar a estrutura e 
 
 *Figura 1: Diagrama de Classes da Aplicação*
 
-Já abaixo, é apresentado o Diagrama de Sequências, o qual busca apresentar os fluxos de interação e algumas de suas nuances entre todas as classes (instanciadas enquanto agentes) da aplicação desenvolvida.
+Já abaixo, é apresentado o Diagrama de Sequência, o qual busca apresentar os fluxos de interação e algumas de suas nuances entre todas as classes (instanciadas enquanto agentes) da aplicação desenvolvida.
 
-<img src="assets/diagrama_de_sequencias.png" alt="Diagrama de Sequências">
+<img src="assets/diagrama_de_sequencia.png" alt="Diagrama de Sequência">
 
-*Figura 2: Diagrama de Sequências da Aplicação*
+*Figura 2: Diagrama de Sequência da Aplicação*
 
 ## Projeto em Execução
 
